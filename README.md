@@ -1,9 +1,18 @@
 bmwrapper
 ========
 
-bmwrapper is a poorly hacked together python script to let Thunderbird and PyBitmessage communicate, similar to AyrA's (much better) application.
+bmwrapper is a poorly hacked together python script to let Thunderbird and PyBitmessage communicate, similar to AyrA's (generally much better) application: ﻿Bitmessage2Mail.
 
-I'm on linux and don't feel like dealing with wine, so I wrote this to fill the same role for myself.
+I'm on Linux, and don't feel like dealing with wine. So I wrote this to fill the same role as B2M, until it is ported or the source code is released.
+
+The script (usually) parses outgoing messages to strip the ugly email header information and put quoted text in PyBitmessage’s '---’ delimited form. Attached images are included, base64 encoded, in an img tag. Incoming messages are likewise parsed to reconstruct a email, with attachment. This works...most of the time, and I’ve tried to make it fail gracefully when something goes wrong.
+
+Running
+-------
+
+    python main.py
+
+That’s about it.
 
 The script operates by running a POP server on localhost:12344, and an SMTP server on localhost:12345.
 
@@ -11,9 +20,16 @@ The pop server is based on pypopper: http://code.activestate.com/recipes/534131-
 
 The SMTP server is based on SMTP sink server: http://djangosnippets.org/snippets/96/
 
-.dok's text client for the bitmessage daemon was referenced as well: <PUT URL HERE>
+.dok's text client for the bitmessage daemon was cannibalized as well: https://github.com/Dokument/PyBitmessage-Daemon
 
-It makes a reasonable effort to interact nicely with people using only PyBitmessage. Outgoing email messages are parsed, with email headers stripped, and attached images are converted to a base64 encoded embedded img tag. Incoming messages are likewise parsed for image tags, and the contents are (usually) converted back to an email attachment. Some effort is made to convert the standard email block quotes into PyBitmessage's '---' line separated quotes.
+Client configuration: (On Thunderbird, YMMV with other clients)
+Use anything as a username, and something along the lines of BM-AddressGoesHere@bm.addr as your email--though everything after the @ is arbitrary and will be stripped.
+For the incoming mail server: POP, localhost, port 12344, don’t use SSL and use ‘normal password’ for authentication.
+For the outgoing mail server: SMTP, localhost, port 12345, don’t use SSL, no password for authentication.
+
+Send p2p messages the obvious way, appending something like “@bm.addr” on the “To" address, just to make the address look valid for your email client.
+
+To send a broadcast, send a message from an address to itself. The script will notice this and send a broadcast instead of a p2p message.
 
 WARNING
 -------
@@ -22,7 +38,7 @@ There are a few issues you should be aware of before running this.
 
 - If you are not careful with your email client configuration, bmwrapper may hit a race condition and eat up all your memory unless you kill it.
 - After exiting, the POP server has a tendency to leave an abandoned socket open for a minute or so, preventing the application from being restarted immediately.
-- In order to comply with protocol, the POP server trashes each message from the PyBitmessage inbox after it has been delivered to an email client.
+- In order to comply with the protocol, the POP server trashes each message from the PyBitmessage inbox after it has been delivered to an email client. This is not immediately visible if you have the PyBitmessage GUI running in the background--they won't disappear until you restart. You have been warned.
 - I have not tested this heavily. It works for me, but there's no guarantee it won't eat your inbox and spit nothing back out, then eat all your memory and lock your machine up.
 
-I wrote this for my own personal use. Don't expect me to provide technical support. I've just released it as a proof of concept / reference for anyone who wants to write a version that doesn't suck.
+I wrote this for my own personal use. Don't expect me to provide much/any technical support. I've just released it for anyone interested in using it. If something breaks, and it affects me, I’ll probably get around to fixing it eventually...
