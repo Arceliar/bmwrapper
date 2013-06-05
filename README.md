@@ -42,3 +42,18 @@ There are a few issues you should be aware of before running this.
 - I have not tested this heavily. It works for me, but there's no guarantee it won't eat your inbox and spit nothing back out, then eat all your memory and lock your machine up.
 
 I wrote this for my own personal use. Don't expect me to provide much/any technical support. I've just released it for anyone interested in using it. If something breaks, and it affects me, I’ll probably get around to fixing it eventually...
+
+Useful Thunderbird Settings
+--------------------------
+
+Account Settings->Composition&Addressing has a checkbox to disable HTML formatting, and to change default quote behavior. I have mine set to place my reply above the quote, my signature below my reply and above the quote. If you use these settings, then when bmwrapper parses for leading '>' and strips them, moving the text below a '-------' line, your outgoing reply messages will look (mostly) consistent with PyBitmessage.
+
+Also useful, if you want messages to be threaded:
+Edit->Preferences->Advanced->Configuration Editor
+mail.strict_threading = false
+mail.thread_without_re = true
+mailnews.localizedRe = AW,Aw,Antwort,VS,Vs,SV,Sv,Svar
+
+You then need to select a folder where you want your messages to be threaded, and set View->Sort_By->Threaded. Then right click the folder, select properties, and click Repair Folder. That'll get it to parse the subject lines again and thread messages. The order can still get messed up, if BM received them out of order, but they're at least grouped correctly (most of the time).
+
+Speaking of folders, I made one for each mailing list and shared address I'm subscribed to. You can set up filters to redirect messages to their folder, based on their To/From addresses. This makes pseudomailinglists and shared address 'chans' much more usable.
