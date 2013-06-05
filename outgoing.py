@@ -37,7 +37,7 @@ class outgoingServer(SMTPServer):
         #This is a multipart message.
         #Unfortunately, now we have to actually do work.
         myText, oldText, image = self._recurseParse(msg)
-        return disclaimer + imageNotice + myText + oldText + image
+        return imageNotice + myText +  oldText + disclaimer + image
       
     def _recurseParse(self, msg):
       text = ''
@@ -55,8 +55,8 @@ class outgoingServer(SMTPServer):
               imagedata += line
           image += '<img '+name+' src="data:'+filetype+'base64,'+imagedata+'" />'
         elif 'multipart' in item['Content-Type']:
-          text_new, image_new = self._recurseParse(item)
-          text += text_new
+          firstTest_new, text_new, image_new = self._recurseParse(item)
+          text += firstText_new + text_new
           image += image_new
         else:
           #Note that there's a chance we may die horribly if nothing returns.
@@ -86,7 +86,7 @@ class outgoingServer(SMTPServer):
             else:
               text += '\n'
         if len(tempText):
-          text += '\n-------------------------------------------------------------------------------\n\n'
+          text += '\n------------------------------------------------------\n'
         rawText = tempText
         tempText = []
         n += 1

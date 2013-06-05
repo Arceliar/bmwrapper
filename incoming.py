@@ -39,9 +39,11 @@ def handlePass(data):
     return "+OK pass accepted"
 
 def handleStat(data):
+    print "Running STAT"
     msgCount = bminterface.listMsgs()
     msgCollection = []
     for msgID in range(msgCount):
+      print "Parsing msg %i of %i" % (msgID+1, msgCount)
       dateTime, toAddress, fromAddress, subject, body = bminterface.get(msgID)
       msgCollection.append(makeEmail(dateTime, toAddress, fromAddress, subject, body))
     msgCount = 0
@@ -54,9 +56,11 @@ def handleStat(data):
     return returnData
 
 def handleList(data):
+    print "Running LIST"
     msgCount = bminterface.listMsgs()
     msgCollection = []
     for msgID in range(msgCount):
+      print "Parsing msg %i of %i" % (msgID+1, msgCount)
       dateTime, toAddress, fromAddress, subject, body = bminterface.get(msgID)
       msgCollection.append(makeEmail(dateTime, toAddress, fromAddress, subject, body))
     returnDataPart2 = ''
@@ -145,7 +149,7 @@ def makeEmail(dateTime, toAddress, fromAddress, subject, body):
             msg.attach(img)
           except:
             print "MIME exception occurred"
-            print "data was..." + itemData.encode('base64')
+            #print "data was..." + itemData.encode('base64')
             pass
     msg['To'] = toAddress
     msg['From'] = fromAddress
@@ -170,7 +174,6 @@ def parseBody(body):
           pass
       if imageData:
         returnData.append(imageData)
-      print body[attachment.start():attachment.end()]
       body = body[:attachment.start()] + body[attachment.end():]
       attachment = re.search(searchString, body, re.DOTALL)
     text = body

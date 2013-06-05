@@ -23,7 +23,7 @@ The SMTP server is based on SMTP sink server: http://djangosnippets.org/snippets
 .dok's text client for the bitmessage daemon was cannibalized as well: https://github.com/Dokument/PyBitmessage-Daemon
 
 Client configuration: (On Thunderbird, YMMV with other clients)
-Use anything as a username, and something along the lines of BM-AddressGoesHere@bm.addr as your email--though everything after the @ is arbitrary and will be stripped.
+Use anything as a username/password, and something along the lines of BM-AddressGoesHere@bm.addr as your email--though everything after the @ is arbitrary and will be stripped.
 For the incoming mail server: POP, localhost, port 12344, don’t use SSL and use ‘normal password’ for authentication.
 For the outgoing mail server: SMTP, localhost, port 12345, don’t use SSL, no password for authentication.
 
