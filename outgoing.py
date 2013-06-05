@@ -90,6 +90,8 @@ class outgoingServer(SMTPServer):
         rawText = tempText
         tempText = []
         n += 1
+      text = text.rstrip('\n')
+      firstText = firstText.rstrip('\n')
       return firstText, text
         
 def run():
