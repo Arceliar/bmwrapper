@@ -26,8 +26,7 @@ class outgoingServer(SMTPServer):
       <!-- Email sent from bmwrapper -->
       <!-- https://github.com/Arceliar/bmwrapper -->
       """
-      imageNotice = """<!-- Note: An image is attached below -->
-      """
+      imageNotice = """<!-- Note: An image is attached below -->\n\n"""
       if not msg.is_multipart():
         #This is a single part message, so there's nothing to do.
         #Will still parse, just to get rid of awkward quote '>' everywhere.

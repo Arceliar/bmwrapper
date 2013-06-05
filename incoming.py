@@ -38,38 +38,36 @@ def handleUser(data):
 def handlePass(data):
     return "+OK pass accepted"
 
-def handleStat(data):
-    print "Running STAT"
+def _getMsgSizes():
     msgCount = bminterface.listMsgs()
-    msgCollection = []
+    msgSizes = []
     for msgID in range(msgCount):
       print "Parsing msg %i of %i" % (msgID+1, msgCount)
       dateTime, toAddress, fromAddress, subject, body = bminterface.get(msgID)
-      msgCollection.append(makeEmail(dateTime, toAddress, fromAddress, subject, body))
-    msgCount = 0
+      msgSizes.append(len(makeEmail(dateTime, toAddress, fromAddress, subject, body)))
+    return msgSizes
+
+def handleStat(data):
+    print "Running STAT"
+    msgSizes = _getMsgSizes()
+    msgCount = len(msgSizes)
     msgSizeTotal = 0
-    for msg in msgCollection:
-      msgCount += 1
-      msgSizeTotal += len(msg)
+    for msgSize in msgSizes:
+      msgSizeTotal += msgSize
     returnData = '+OK %i %i\r\n' % (msgCount, msgSizeTotal)
     print "Answering STAT"
     return returnData
 
 def handleList(data):
     print "Running LIST"
-    msgCount = bminterface.listMsgs()
-    msgCollection = []
-    for msgID in range(msgCount):
-      print "Parsing msg %i of %i" % (msgID+1, msgCount)
-      dateTime, toAddress, fromAddress, subject, body = bminterface.get(msgID)
-      msgCollection.append(makeEmail(dateTime, toAddress, fromAddress, subject, body))
-    returnDataPart2 = ''
     msgCount = 0
+    returnDataPart2 = ''
+    msgSizes = _getMsgSizes()
     msgSizeTotal = 0
-    for msg in msgCollection:
+    for msgSize in msgSizes:
+      msgSizeTotal += msgSize
       msgCount += 1
-      msgSizeTotal += len(msg)
-      returnDataPart2 += '%i %i\r\n' % (msgCount, len(msg))
+      returnDataPart2 += '%i %i\r\n' % (msgCount, msgSize)
     returnDataPart2 += '.'
     returnDataPart1 = '+OK %i messages (%i octets)\r\n' % (msgCount, msgSizeTotal)
     returnData = returnDataPart1 + returnDataPart2
