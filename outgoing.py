@@ -71,8 +71,9 @@ class outgoingServer(SMTPServer):
           if rawText[line]:
             if rawText[line][0] == '>':
               rawText[line] = rawText[line][1:]
-              if rawText[line][0] == ' ':
-                rawText[line] = rawText[line][1:]
+              if rawText[line]:
+                if rawText[line][0] == ' ':
+                  rawText[line] = rawText[line][1:]
               tempText.append(rawText[line])
             else:
               if n == 0:
