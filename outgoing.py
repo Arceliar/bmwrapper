@@ -73,7 +73,7 @@ class outgoingServer(SMTPServer):
               rawText[line] = rawText[line][1:]
               if rawText[line][0] == ' ':
                 rawText[line] = rawText[line][1:]
-              tempText.append(rawText[line][1:].lstrip(' '))
+              tempText.append(rawText[line])
             else:
               if n == 0:
                 firstText += rawText[line]+'\n'
