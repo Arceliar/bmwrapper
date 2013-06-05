@@ -82,7 +82,7 @@ class outgoingServer(SMTPServer):
             else:
               text += '\n'
         if len(tempText):
-          text += '------------------------------------------------------\n'
+          text += '\n------------------------------------------------------\n'
         rawText = tempText
         tempText = []
         n += 1
