@@ -49,16 +49,16 @@ Useful Thunderbird Settings
 Account Settings->Composition&Addressing has a checkbox to disable HTML formatting, and to change default quote behavior. I have mine set to place my reply above the quote, my signature below my reply and above the quote. If you use these settings, then when bmwrapper parses for leading '>' and strips them, moving the text below a '-------' line, your outgoing reply messages will look (mostly) consistent with PyBitmessage.
 
 If you want to remove the reply header: (The line that says who wrote the last message, and when you received it)
-    Edit->Preferences->Advanced->Configuration Editor
-    mailnews.reply_header_type = 0
-    mailnews.reply_header_originalmessage = (change this to an empty string)
+- Edit->Preferences->Advanced->Configuration Editor
+- mailnews.reply_header_type = 0
+- mailnews.reply_header_originalmessage = (change this to an empty string)
     
 You can leave the address of the person you're replying to, but not the timestamp, by changing the first setting to 1 instead.
 
 Also useful, if you want messages to be threaded:
-    mail.strict_threading = false
-    mail.thread_without_re = true
-    mailnews.localizedRe = AW,Aw,Antwort,VS,Vs,SV,Sv,Svar
+- mail.strict_threading = false
+- mail.thread_without_re = true
+- mailnews.localizedRe = AW,Aw,Antwort,VS,Vs,SV,Sv,Svar
 
 You then need to select a folder where you want your messages to be threaded, and set View->Sort_By->Threaded. Then right click the folder, select properties, and click Repair Folder. That'll get it to parse the subject lines again and thread messages. The order can still get messed up, if BM received them out of order, but they're at least grouped correctly (most of the time).
 
