@@ -132,6 +132,7 @@ def makeEmail(dateTime, toAddress, fromAddress, subject, body):
       body = body[1:]
       msg.attach(bodyText)
       for item in body:
+        img = 0
         itemType, itemData = [0], [0]
         try:
           itemType, itemData = item.split(';', 1)
@@ -141,14 +142,22 @@ def makeEmail(dateTime, toAddress, fromAddress, subject, body):
           pass
         if itemType[0] == 'image':
           try:
-            itemData = itemData.lstrip('base64,').strip(' ').strip('\n').decode('base64')
-            img = email.mime.image.MIMEImage(itemData)
+            itemDataFinal = itemData.lstrip('base64,').strip(' ').strip('\n').decode('base64')
+            img = email.mime.image.MIMEImage(itemDataFinal)
+          except:
+            #Some images don't auto-detect type correctly with email.mime.image
+            #Namely, jpegs with embeded color profiles look problematic
+            #Trying to set it manually...
+            try:
+              itemDataFinal = itemData.lstrip('base64,').strip(' ').strip('\n').decode('base64')
+              img = email.mime.image.MIMEImage(itemDataFinal, _subtype=itemType[1])
+            except:
+              print "Failed to parse image data. This could be an image."
+              print "This could be from an image tag filled with junk data."
+              print "It could also be a python email.mime.image problem."
+          if img:
             img.add_header('Content-Disposition', 'attachment')
             msg.attach(img)
-          except:
-            print "MIME exception occurred"
-            #print "data was..." + itemData.encode('base64')
-            pass
     msg['To'] = toAddress
     msg['From'] = fromAddress
     msg['Subject'] = subject
@@ -156,14 +165,13 @@ def makeEmail(dateTime, toAddress, fromAddress, subject, body):
     return msg.as_string()
     
 def parseBody(body):
-    #TODO Fix this so it parses for images, strips them from the text, decodes and appends them.
     returnData = []
     text = ''
     searchString = '<img[^>]*'
-    attachment = re.search(searchString, body, re.DOTALL)
+    attachment = re.search(searchString, body)
     while attachment:
       imageCode = body[attachment.start():attachment.end()]
-      imageDataRange = re.search('src=("|\')(.*)("|\')', imageCode, re.DOTALL)
+      imageDataRange = re.search('src=[\"\'][^\"\']*[\"\']', imageCode)
       imageData=''
       if imageDataRange:
         try:
@@ -172,8 +180,8 @@ def parseBody(body):
           pass
       if imageData:
         returnData.append(imageData)
-      body = body[:attachment.start()] + body[attachment.end():]
-      attachment = re.search(searchString, body, re.DOTALL)
+      body = body[:attachment.start()] + body[attachment.end()+1:]
+      attachment = re.search(searchString, body)
     text = body
     returnData = [text] + returnData
     return returnData

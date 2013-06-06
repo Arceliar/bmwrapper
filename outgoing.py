@@ -23,7 +23,7 @@ class outgoingServer(SMTPServer):
     
     def _bmformat(self, msg):
       disclaimer = "\n<!-- Email sent from bmwrapper -->\n<!-- https://github.com/Arceliar/bmwrapper -->\n"
-      imageNotice = """<!-- Note: An image is attached below -->\n"""
+      imageNotice = "<!-- Note: An image is attached below -->\n"
       if not msg.is_multipart():
         #This is a single part message, so there's nothing to do.
         #Will still parse, just to get rid of awkward quote '>' everywhere.
@@ -86,7 +86,7 @@ class outgoingServer(SMTPServer):
             else:
               text += '\n'
         if len(tempText):
-          text += '\n------------------------------------------------------\n'
+          text += '\n\n------------------------------------------------------\n'
         rawText = tempText
         tempText = []
         n += 1

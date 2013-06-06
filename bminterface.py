@@ -6,6 +6,7 @@ import time
 import email.utils
 
 purgeList = []
+allMessages = []
 
 def _getKeyLocation():  #make this not suck later
     return '~/.PyBitmessage/keys.dat'
@@ -69,8 +70,11 @@ def send(toAddress, fromAddress, subject, body):
       return _sendMessage(toAddress, fromAddress, subject, body)
 
 def _getAll():
-    api = _makeApi(_getKeyLocation())
-    return json.loads(api.getAllInboxMessages())
+    global allMessages
+    if not allMessages:
+      api = _makeApi(_getKeyLocation())
+      allMessages = json.loads(api.getAllInboxMessages())
+    return allMessages
 
 def get(msgID):
     inboxMessages = _getAll()
@@ -95,9 +99,11 @@ def markForDelete(msgID):
     return 0
     
 def cleanup():
+    global allMessages
     global purgeList
     while len(purgeList):
       _deleteMessage(purgeList.pop())
+    allMessages = []
     return 0
 
 def _deleteMessage(msgRef):
