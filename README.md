@@ -10,6 +10,10 @@ The script (usually) parses outgoing messages to strip the ugly email header inf
 Running
 -------
 
+First make sure you have the api configured in your key.dat (check bitmessage.org's wiki for details). If you're running in portable mode, you need to put your bmwrapper scripts in the same directory as your keys.dat file. If you run bitmessage in normal mode, it should try to detect where your keys.dat is saved.
+
+Then do this:
+
     python main.py
 
 That’s about it.
