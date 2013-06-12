@@ -14,6 +14,12 @@ class outgoingServer(SMTPServer):
         subject = msg['Subject']
         body = self._bmformat(msg)
         
+        #Make sure we don't send an actually blank subject or body--this can cause problems.
+        if not subject:
+          subject = ' '
+        if not body:
+          body = ' '
+        
         if bminterface.send(toAddress, fromAddress, subject, body):
           print "Message queued for sending..."
         else:
