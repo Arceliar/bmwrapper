@@ -7,6 +7,13 @@ I'm on Linux, and don't feel like dealing with wine. So I wrote this to fill the
 
 The script (usually) parses outgoing messages to strip the ugly email header information and put quoted text in PyBitmessage’s '---’ delimited form. Attached images are included, base64 encoded, in an img tag. Incoming messages are likewise parsed to reconstruct a email, with attachment. This works...most of the time, and I’ve tried to make it fail gracefully when something goes wrong.
 
+Tutorial
+--------
+
+Apatomoose, a bmwrapper user, made a tutorial on how to set up Bitmessage with bmwrapper and Thunderbird Portable on Windows: http://www.youtube.com/watch?v=ppk_zzjZRIg
+
+This is better than the instructions below. If you watch the tutorial, you can probably skip the rest of this readme. Although, if you're not used to using Thunderbird, some of the Useful Settings at the end may increase quality of life (e.g. get message threading to work).
+
 Running
 -------
 
