@@ -180,9 +180,13 @@ def apiData():
         apiEnabled = apiConfigured
     except:
         apiConfigured = False #If not found, set to false since it still needs to be configured
+        print "You need to edit your keys.dat file and enable bitmessage's API"
+        print "See for more details: https://bitmessage.org/wiki/API"
+        print "Will now crash..."
+        raise
 
-    if (apiConfigured == False):#If the apienabled == false or is not present in the keys.dat file, notify the user and set it up
-        apiInit(apiEnabled) #Initalize the keys.dat file with API information
+    #if (apiConfigured == False):#If the apienabled == false or is not present in the keys.dat file, notify the user and set it up
+        #apiInit(apiEnabled) #Initalize the keys.dat file with API information
 
     #keys.dat file was found or appropriately configured, allow information retrieval
     apiEnabled = config.getboolean('bitmessagesettings','apienabled')
