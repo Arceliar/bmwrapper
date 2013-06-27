@@ -142,7 +142,7 @@ def lookupAppdataFolder(): #gets the appropriate folders for the .dat files depe
     elif 'win32' in sys.platform or 'win64' in sys.platform:
         dataFolder = path.join(environ['APPDATA'], APPNAME) + '\\'
     else:
-        dataFolder = path.expanduser(path.join("~", "." + APPNAME + "/"))
+        dataFolder = path.expanduser(path.join("~", "." + "config", APPNAME + "/"))
     return dataFolder
     
 def apiData():
