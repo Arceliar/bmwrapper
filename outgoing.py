@@ -75,7 +75,6 @@ class outgoingServer(SMTPServer):
       while len(rawText):
         for line in range(len(rawText)):
           if rawText[line]:
-            print rawText[line]
             if (rawText[line][0] == '>'): # and rawText[line].strip('>')[0] == ' '):
               rawText[line] = rawText[line][1:]
               if rawText[line]:

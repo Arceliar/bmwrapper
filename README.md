@@ -3,7 +3,7 @@ bmwrapper
 
 bmwrapper is a poorly hacked together python script to let Thunderbird and PyBitmessage communicate, similar to AyrA's (generally much better) application: ﻿Bitmessage2Mail.
 
-I'm on Linux, and don't feel like dealing with wine. So I wrote this to fill the same role as B2M, until it is ported or the source code is released.
+I'm on Linux, and don't feel like dealing with wine. So I wrote this to fill the same role as B2M, until the source code was released. (Which has since been open-sourced: https://github.com/AyrA/BitMailServer)
 
 The script (usually) parses outgoing messages to strip the ugly email header information and put quoted text in PyBitmessage’s '---’ delimited form. Attached images are included, base64 encoded, in an img tag. Incoming messages are likewise parsed to reconstruct a email, with attachment. This works...most of the time, and I’ve tried to make it fail gracefully when something goes wrong.
 
