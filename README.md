@@ -66,6 +66,9 @@ If you want to remove the reply header: (The line that says who wrote the last m
     
 You can leave the address of the person you're replying to, but not the timestamp, by changing the first setting to 1 instead.
 
+To disable word wrapping: **HIGHLY RECOMMENDED**
+- mailnews.wraplength = 0
+
 Also useful, if you want messages to be threaded:
 - mail.strict_threading = false
 - mail.thread_without_re = true
