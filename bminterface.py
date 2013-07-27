@@ -44,6 +44,9 @@ def _sendBroadcast(fromAddress, subject, body):
       return 0
       
 def _stripAddress(address):
+    if 'broadcast' in address.lower():
+      return 'broadcast'
+
     orig = address
     alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
     retstring = ''
@@ -64,7 +67,7 @@ def send(toAddress, fromAddress, subject, body):
     fromAddress = _stripAddress(fromAddress)
     subject = subject.encode('base64')
     body = body.encode('base64')
-    if toAddress == fromAddress:
+    if toAddress == 'broadcast':
       return _sendBroadcast(fromAddress, subject, body)
     else:
       return _sendMessage(toAddress, fromAddress, subject, body)
