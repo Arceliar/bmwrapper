@@ -3,6 +3,7 @@ import threading
 import email.mime.text
 import email.mime.image
 import email.mime.multipart
+import email.header
 import bminterface
 import re
 
@@ -160,7 +161,7 @@ def makeEmail(dateTime, toAddress, fromAddress, subject, body):
             msg.attach(img)
     msg['To'] = toAddress
     msg['From'] = fromAddress
-    msg['Subject'] = subject
+    msg['Subject'] = email.header.Header(subject, 'UTF-8')
     msg['Date'] = dateTime
     return msg.as_string()
     
