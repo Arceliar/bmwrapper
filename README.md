@@ -40,7 +40,7 @@ For the outgoing mail server: SMTP, localhost, port 12345, don’t use SSL, no p
 
 Send p2p messages the obvious way, appending something like “@bm.addr” on the “To" address, just to make the address look valid for your email client.
 
-To send a broadcast, send a message from an address to itself. The script will notice this and send a broadcast instead of a p2p message.
+To send a broadcast, send a message to broadcast@bm.addr (as above, the details are arbitrary, the word 'broadcast' just has to be in there somewhere).
 
 WARNING
 -------
