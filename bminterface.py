@@ -9,7 +9,7 @@ purgeList = []
 allMessages = []
 
 def _getKeyLocation():  #make this not suck later
-    return '~/.PyBitmessage/keys.dat'
+    return '~/.config/PyBitmessage/keys.dat'
 
 def _getConfig(keys):
     return apiData()

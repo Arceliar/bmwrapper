@@ -3,6 +3,7 @@ import threading
 import email.mime.text
 import email.mime.image
 import email.mime.multipart
+import email.header
 import bminterface
 import re
 
@@ -125,10 +126,10 @@ def makeEmail(dateTime, toAddress, fromAddress, subject, body):
     body = parseBody(body)
     msgType = len(body)
     if msgType == 1:
-      msg = email.mime.text.MIMEText(body[0])
+      msg = email.mime.text.MIMEText(body[0], 'plain', 'UTF-8')
     else:
       msg = email.mime.multipart.MIMEMultipart('mixed')
-      bodyText = email.mime.text.MIMEText(body[0])
+      bodyText = email.mime.text.MIMEText(body[0], 'plain', 'UTF-8')
       body = body[1:]
       msg.attach(bodyText)
       for item in body:
@@ -160,7 +161,7 @@ def makeEmail(dateTime, toAddress, fromAddress, subject, body):
             msg.attach(img)
     msg['To'] = toAddress
     msg['From'] = fromAddress
-    msg['Subject'] = subject
+    msg['Subject'] = email.header.Header(subject, 'UTF-8')
     msg['Date'] = dateTime
     return msg.as_string()
     
