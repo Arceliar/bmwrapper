@@ -6,6 +6,7 @@ import email.mime.multipart
 import email.header
 import bminterface
 import re
+import select
 
 class ChatterboxConnection(object):
     END = "\r\n"
@@ -201,44 +202,47 @@ dispatch = dict(
 )
 
 
-def incomingServer(host, port):
-    popthread = threading.Thread(target=incomingServer_main, args=(host, port))
+def incomingServer(host, port, run_event):
+    popthread = threading.Thread(target=incomingServer_main, args=(host, port, run_event))
     popthread.daemon = True
     popthread.start()
+    return popthread
 
-def incomingServer_main(host, port):
+def incomingServer_main(host, port, run_event):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((host, port))
+    sock.listen(1)
+    if host:
+        hostname = host
+    else:
+        hostname = "localhost"
     try:
-        if host:
-            hostname = host
-        else:
-            hostname = "localhost"
-        while True:
-            sock.listen(1)
-            conn, addr = sock.accept()
-            try:
-                conn = ChatterboxConnection(conn)
-                conn.sendall("+OK server ready")
-                while True:
-                    data = conn.recvall()
-                    command = data.split(None, 1)[0]
-                    try:
-                        cmd = dispatch[command]
-                    except KeyError:
-                        conn.sendall("-ERR unknown command")
-                    else:
-                        conn.sendall(cmd(data))
-                        if cmd is handleQuit:
-                            break
-            finally:
-                conn.close()
+        while run_event.is_set():
+            ready = select.select([sock], [], [], .2)
+            if ready[0]:
+                conn, addr = sock.accept()
+                try:
+                    conn = ChatterboxConnection(conn)
+                    conn.sendall("+OK server ready")
+                    while run_event.is_set():
+                        data = conn.recvall()
+                        command = data.split(None, 1)[0]
+                        try:
+                            cmd = dispatch[command]
+                        except KeyError:
+                            conn.sendall("-ERR unknown command")
+                        else:
+                            conn.sendall(cmd(data))
+                            if cmd is handleQuit:
+                                break
+                finally:
+                    conn.close()
 
     except (SystemExit, KeyboardInterrupt):
       pass
     except Exception, ex:
       raise
     finally:
-        sock.shutdown(socket.SHUT_RDWR)
         sock.close()
 
