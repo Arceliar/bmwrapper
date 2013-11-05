@@ -4,6 +4,7 @@ import json
 import datetime
 import time
 import email.utils
+import os
 
 purgeList = []
 allMessages = []
