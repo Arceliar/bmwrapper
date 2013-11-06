@@ -2,6 +2,7 @@ import asyncore
 from smtpd import SMTPServer
 import email.parser, email.header
 import bminterface
+import logging
 
 class outgoingServer(SMTPServer):
     def process_message(self, peer, mailfrom, rcpttos, data):
@@ -21,9 +22,9 @@ class outgoingServer(SMTPServer):
           body = ' '
         
         if bminterface.send(toAddress, fromAddress, subject, body):
-          print "Message queued for sending..."
+          logging.info("Message queued for sending...")
         else:
-          print "There was an error trying to send the message..."
+          logging.info("There was an error trying to send the message...")
         
         return 0
     

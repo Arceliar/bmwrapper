@@ -7,6 +7,7 @@ import email.header
 import bminterface
 import re
 import select
+import logging
 
 class ChatterboxConnection(object):
     END = "\r\n"
@@ -44,24 +45,22 @@ def _getMsgSizes():
     msgCount = bminterface.listMsgs()
     msgSizes = []
     for msgID in range(msgCount):
-      print "Parsing msg %i of %i" % (msgID+1, msgCount)
+      logging.debug("Parsing msg %i of %i" % (msgID+1, msgCount))
       dateTime, toAddress, fromAddress, subject, body = bminterface.get(msgID)
       msgSizes.append(len(makeEmail(dateTime, toAddress, fromAddress, subject, body)))
     return msgSizes
 
 def handleStat(data):
-    print "Running STAT"
     msgSizes = _getMsgSizes()
     msgCount = len(msgSizes)
     msgSizeTotal = 0
     for msgSize in msgSizes:
       msgSizeTotal += msgSize
     returnData = '+OK %i %i\r\n' % (msgCount, msgSizeTotal)
-    print "Answering STAT"
+    logging.debug("Answering STAT: %i %i" % (msgCount, msgSizeTotal))
     return returnData
 
 def handleList(data):
-    print "Running LIST"
     msgCount = 0
     returnDataPart2 = ''
     msgSizes = _getMsgSizes()
@@ -73,7 +72,7 @@ def handleList(data):
     returnDataPart2 += '.'
     returnDataPart1 = '+OK %i messages (%i octets)\r\n' % (msgCount, msgSizeTotal)
     returnData = returnDataPart1 + returnDataPart2
-    print "Answering LIST"
+    logging.debug("Answering LIST: %i %i" % (msgCount, msgSizeTotal))
     return returnData
 
 def handleTop(data):
@@ -88,7 +87,7 @@ def handleTop(data):
     return "+OK top of message follows\r\n%s\r\n." % text
 
 def handleRetr(data):
-    print data.split()
+    logging.debug(data.split())
     msgID = int(data.split()[1])-1
     dateTime, toAddress, fromAddress, subject, body = bminterface.get(msgID)
     msg = makeEmail(dateTime, toAddress, fromAddress, subject, body)
@@ -108,12 +107,12 @@ def handleQuit(data):
     
 def handleUIDL(data):
     data = data.split()
-    print data
+    logging.debug(data)
     if len(data) == 1:
       refdata = bminterface.getUIDLforAll()
     else:
       refdata = bminterface.getUIDLforSingle(int(data[1])-1)
-    print refdata
+    logging.debug(refdata)
     if len(refdata) == 1:
       returnData = '+OK ' + data[1] + str(refdata[0])
     else:
@@ -140,7 +139,7 @@ def makeEmail(dateTime, toAddress, fromAddress, subject, body):
           itemType, itemData = item.split(';', 1)
           itemType = itemType.split('/', 1)
         except:
-          print "Could not parse message type"
+          logging.warning("Could not parse message type")
           pass
         if itemType[0] == 'image':
           try:
@@ -154,9 +153,9 @@ def makeEmail(dateTime, toAddress, fromAddress, subject, body):
               itemDataFinal = itemData.lstrip('base64,').strip(' ').strip('\n').decode('base64')
               img = email.mime.image.MIMEImage(itemDataFinal, _subtype=itemType[1])
             except:
-              print "Failed to parse image data. This could be an image."
-              print "This could be from an image tag filled with junk data."
-              print "It could also be a python email.mime.image problem."
+              logging.warning("Failed to parse image data. This could be an image.")
+              logging.warning("This could be from an image tag filled with junk data.")
+              logging.warning("It could also be a python email.mime.image problem.")
           if img:
             img.add_header('Content-Disposition', 'attachment')
             msg.attach(img)
@@ -209,19 +208,21 @@ def incomingServer(host, port, run_event):
     return popthread
 
 def incomingServer_main(host, port, run_event):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind((host, port))
-    sock.listen(1)
-    if host:
-        hostname = host
-    else:
-        hostname = "localhost"
+    sock = None
     try:
         while run_event.is_set():
+            if sock is None:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                sock.bind((host, port))
+                sock.listen(1)
+
             ready = select.select([sock], [], [], .2)
             if ready[0]:
                 conn, addr = sock.accept()
+                # stop listening, one client only
+                sock.close()
+                sock = None
                 try:
                     conn = ChatterboxConnection(conn)
                     conn.sendall("+OK server ready")
