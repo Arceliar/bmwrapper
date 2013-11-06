@@ -3,18 +3,29 @@
 import outgoing
 import incoming
 import asyncore
+import threading
+import sys
+import logging
 
 def run():
+    logging.basicConfig(format='%(asctime)s %(levelname)s - %(message)s', level=logging.DEBUG)
+
+    run_event = threading.Event()
+    run_event.set()
+
     outserv = outgoing.outgoingServer(('localhost', 12345), None)
-    inserv = incoming.incomingServer('localhost', 12344)
+    inserv = incoming.incomingServer('localhost', 12344, run_event)
+
     try:
-        print "Press Ctrl+C to exit."
+        logging.info("Press Ctrl+C to exit.")
         asyncore.loop()
     except KeyboardInterrupt:
-        print "Exiting..."
-        print "Sockets might get stuck open..."
-        print "Just wait a minute before restarting the program..."
-        pass
+        logging.info("Exiting...")
+        run_event.clear()
+        logging.debug("waiting for threads...")
+        inserv.join()
+        logging.debug("all threads done...")
+        sys.exit(0)
 
 if __name__ == '__main__':
     run()

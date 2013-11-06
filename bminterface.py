@@ -4,6 +4,8 @@ import json
 import datetime
 import time
 import email.utils
+import os
+import logging
 
 purgeList = []
 allMessages = []
@@ -22,7 +24,7 @@ def _getConfig(keys):
       api_uname = config.get('bitmessagesettings', 'apiusername')
       api_passwd = config.get('bitmessagesettings', 'apipassword')
     except:
-        print "Could not load keys.dat config"
+        logging.warning("Could not load keys.dat config")
         return 0
     return "http://"+api_uname+":"+api_passwd+"@"+api_iface+":"+str(api_port)+"/"
 
@@ -59,7 +61,7 @@ def _stripAddress(address):
           address = address[1:]
       else:
         address = address[1:]
-    print "converted address " + orig + " to " + retstring
+    logging.info("converted address " + orig + " to " + retstring)
     return retstring
 
 def send(toAddress, fromAddress, subject, body):
@@ -142,7 +144,7 @@ def lookupAppdataFolder(): #gets the appropriate folders for the .dat files depe
         if "HOME" in environ:
             dataFolder = path.join(os.environ["HOME"], "Library/Application support/", APPNAME) + '/'
         else:
-            print 'Could not find home folder, please report this message and your OS X version to the Daemon Github.'
+            logging.warning('Could not find home folder, please report this message and your OS X version to the Daemon Github.')
             os.exit()
 
     elif 'win32' in sys.platform or 'win64' in sys.platform:
