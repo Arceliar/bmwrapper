@@ -245,5 +245,6 @@ def incomingServer_main(host, port, run_event):
     except Exception, ex:
       raise
     finally:
-        sock.close()
+        if sock is not None:
+            sock.close()
 
