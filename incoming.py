@@ -56,14 +56,23 @@ def handleStat(data):
     msgSizeTotal = 0
     for msgSize in msgSizes:
       msgSizeTotal += msgSize
-    returnData = '+OK %i %i\r\n' % (msgCount, msgSizeTotal)
+    returnData = '+OK %i %i' % (msgCount, msgSizeTotal)
     logging.debug("Answering STAT: %i %i" % (msgCount, msgSizeTotal))
     return returnData
 
 def handleList(data):
+    cmd, msgId = data.split()
+    msgSizes = _getMsgSizes()
+    if msgId is not None:
+        # means the server wants a single message response
+        i = int(msgId) - 1
+        if i >= len(msgSizes):
+            return "-ERR no such message"
+        else:
+            msgSize = msgSizes[i]
+            return "+OK %s %s" % (msgId, msgSize)
     msgCount = 0
     returnDataPart2 = ''
-    msgSizes = _getMsgSizes()
     msgSizeTotal = 0
     for msgSize in msgSizes:
       msgSizeTotal += msgSize
@@ -73,18 +82,22 @@ def handleList(data):
     returnDataPart1 = '+OK %i messages (%i octets)\r\n' % (msgCount, msgSizeTotal)
     returnData = returnDataPart1 + returnDataPart2
     logging.debug("Answering LIST: %i %i" % (msgCount, msgSizeTotal))
+    logging.debug(returnData)
     return returnData
 
 def handleTop(data):
     msg = 'test'
+    logging.debug(data.split())
     cmd, msgID, lines = data.split()
     msgID = int(msgID)-1
     lines = int(lines)
+    logging.debug(lines)
     dateTime, toAddress, fromAddress, subject, body = bminterface.get(msgID)
+    logging.debug(subject)
     msg = makeEmail(dateTime, toAddress, fromAddress, subject, body)
     top, bot = msg.split("\n\n", 1)
-    text = top + "\r\n\r\n" + "\r\n".join(bot[:lines])
-    return "+OK top of message follows\r\n%s\r\n." % text
+    #text = top + "\r\n\r\n" + "\r\n".join(bot[:lines])
+    return "+OK top of message follows\r\n%s\r\n." % top
 
 def handleRetr(data):
     logging.debug(data.split())
@@ -104,7 +117,12 @@ def handleNoop(data):
 def handleQuit(data):
     bminterface.cleanup()
     return "+OK just pretend I'm gone"
-    
+
+def handleCapa(data):
+    returnData = "+OK List of capabilities follows\r\n"
+    returnData += "CAPA\r\nTOP\r\nUSER\r\nPASS\r\nUIDL\r\n."
+    return returnData
+
 def handleUIDL(data):
     data = data.split()
     logging.debug(data)
@@ -114,7 +132,7 @@ def handleUIDL(data):
       refdata = bminterface.getUIDLforSingle(int(data[1])-1)
     logging.debug(refdata)
     if len(refdata) == 1:
-      returnData = '+OK ' + data[1] + str(refdata[0])
+      returnData = '+OK ' + data[0] + str(refdata[0])
     else:
       returnData = '+OK listing UIDL numbers...\r\n'
       for msgID in range(len(refdata)):
@@ -197,7 +215,8 @@ dispatch = dict(
     DELE=handleDele,
     NOOP=handleNoop,
     QUIT=handleQuit,
-    #UIDL=handleUIDL,
+    CAPA=handleCapa,
+    UIDL=handleUIDL,
 )
 
 
