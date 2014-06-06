@@ -9,6 +9,7 @@ import re
 import select
 import logging
 
+
 class ChatterboxConnection(object):
     END = "\r\n"
     def __init__(self, conn):
@@ -36,6 +37,15 @@ class ChatterboxConnection(object):
 
 
 def handleUser(data):
+    d = data.split()
+    logging.debug("data:%s" % d)
+    username = d[-1]
+    if username[:3] == 'BM-':
+        logging.debug("Only showing messages for %s" % username)
+        bminterface.registerAddress(username)
+    else:
+        logging.debug("Showing all messages in the inbox")
+        bminterface.registerAddress(None)
     return "+OK user accepted"
 
 def handlePass(data):

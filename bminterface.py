@@ -9,6 +9,7 @@ import logging
 
 purgeList = []
 allMessages = []
+currentAddress = None
 
 def _getKeyLocation():  #make this not suck later
     return '~/.config/PyBitmessage/keys.dat'
@@ -64,6 +65,11 @@ def _stripAddress(address):
     logging.info("converted address " + orig + " to " + retstring)
     return retstring
 
+def registerAddress(address):
+    global currentAddress
+    currentAddress = address
+    logging.debug("Set current address to %s" % currentAddress)
+
 def send(toAddress, fromAddress, subject, body):
     toAddress = _stripAddress(toAddress)
     fromAddress = _stripAddress(fromAddress)
@@ -76,9 +82,17 @@ def send(toAddress, fromAddress, subject, body):
 
 def _getAll():
     global allMessages
+    global currentAddress
     if not allMessages:
       api = _makeApi(_getKeyLocation())
       allMessages = json.loads(api.getAllInboxMessages())
+    logging.debug("current address is %s" % currentAddress)
+    if currentAddress is not None:
+        ret = []
+        for msg in allMessages['inboxMessages']:
+            if msg['toAddress'] == currentAddress:
+                ret.append(msg)
+        return dict(inboxMessages=ret)
     return allMessages
 
 def get(msgID):
