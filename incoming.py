@@ -61,9 +61,11 @@ def handleStat(data):
     return returnData
 
 def handleList(data):
-    cmd, msgId = data.split()
+    dataList = data.split()
+    cmd = dataList[0]
     msgSizes = _getMsgSizes()
-    if msgId is not None:
+    if len(dataList) > 1:
+        msgId = dataList[1]
         # means the server wants a single message response
         i = int(msgId) - 1
         if i >= len(msgSizes):
@@ -120,7 +122,9 @@ def handleQuit(data):
 
 def handleCapa(data):
     returnData = "+OK List of capabilities follows\r\n"
-    returnData += "CAPA\r\nTOP\r\nUSER\r\nPASS\r\nUIDL\r\n."
+    for k in dispatch:
+        returnData += "%s\r\n" % k
+    returnData += "."
     return returnData
 
 def handleUIDL(data):
@@ -128,16 +132,15 @@ def handleUIDL(data):
     logging.debug(data)
     if len(data) == 1:
       refdata = bminterface.getUIDLforAll()
+      logging.debug(refdata)
+      returnData = '+OK\r\n'
+      for msgID, d in enumerate(refdata):
+        returnData += "%s %s\r\n" % (msgID+1, d)
+      returnData += '.'
     else:
       refdata = bminterface.getUIDLforSingle(int(data[1])-1)
-    logging.debug(refdata)
-    if len(refdata) == 1:
+      logging.debug(refdata)
       returnData = '+OK ' + data[0] + str(refdata[0])
-    else:
-      returnData = '+OK listing UIDL numbers...\r\n'
-      for msgID in range(len(refdata)):
-        returnData += str(msgID+1) + ' ' + refdata[msgID] + '\r\n'
-      returnData += '.'
     return returnData
     
 def makeEmail(dateTime, toAddress, fromAddress, subject, body):
@@ -247,6 +250,7 @@ def incomingServer_main(host, port, run_event):
                     conn.sendall("+OK server ready")
                     while run_event.is_set():
                         data = conn.recvall()
+                        logging.debug("Answering %s" % data)
                         command = data.split(None, 1)[0]
                         try:
                             cmd = dispatch[command]
